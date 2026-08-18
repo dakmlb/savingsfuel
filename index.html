@@ -10,7 +10,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<title>SavingsFuel v1.5 — iOS / PWA Edition</title>
+<title>SavingsFuel v1.6.1 — iOS / PWA Edition</title>
 <style>
 :root{
  --bg:#050608;--card:#0d1116;--card2:#11161c;--line:#2d343d;
@@ -562,6 +562,33 @@ body{padding-bottom:env(safe-area-inset-bottom)}
   .sf-bottom-item b{font-size:8px}
 }
 </style>
+
+<style id="sf-mobile-v161">
+.sf-mobile-hint{display:none}
+.sf-fullscreen-gauge{
+  position:fixed;inset:0;z-index:10050;display:none;
+  background:#05090d;color:#f4f7f8;
+  padding:max(10px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));
+  touch-action:pan-y;
+}
+.sf-fullscreen-gauge.open{display:flex;flex-direction:column}
+.sf-fs-head{display:flex;align-items:center;gap:8px}
+.sf-fs-head button{width:44px;height:44px;border:1px solid #35464f;background:#0c151c;color:#eef4f6;border-radius:10px;font-size:22px;font-weight:900}
+.sf-fs-name{flex:1;text-align:center;font-size:20px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sf-fs-stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.sf-fs-stage .sf-fs-gauge{width:min(94vw,560px)}
+.sf-fs-gauge svg{width:100%;height:auto;display:block}
+.sf-fs-percent{font-size:44px;font-weight:1000;color:#82f10c;line-height:1}
+.sf-fs-amount{font-size:18px;font-weight:850;margin-top:7px}
+.sf-fs-date{font-size:13px;color:#9ba8af;margin-top:5px}
+.sf-fs-nav{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 0 3px}
+.sf-fs-nav button{width:52px;height:48px;border:1px solid #3b4c55;background:#0b151c;color:#f3f6f7;border-radius:12px;font-size:23px}
+.sf-fs-dots{display:flex;gap:6px;max-width:230px;overflow:hidden;align-items:center;justify-content:center}
+.sf-fs-dot{width:7px;height:7px;border-radius:50%;background:#53636c;flex:0 0 auto}
+.sf-fs-dot.active{width:20px;border-radius:5px;background:#82f10c}
+@media(max-width:700px){
+  .sf-mobile-hint{display:flex;justify-content:center;gap:8px;color:#8d9ba2;font-size:10px;margin:4px 0 8px}
+}
 </head>
 <body class="sf-home">
 
