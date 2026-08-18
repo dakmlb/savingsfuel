@@ -1,0 +1,1398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050608">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SavingsFuel">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<title>SavingsFuel v1.5 — iOS / PWA Edition</title>
+<style>
+:root{
+ --bg:#050608;--card:#0d1116;--card2:#11161c;--line:#2d343d;
+ --text:#f5f6f8;--muted:#9fa7b0;--red:#ff3030;--green:#68d83f;
+ --yellow:#f1c31c;--blue:#4da3ff;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
+body{margin:0;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+button,input{font:inherit}
+button{touch-action:manipulation}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;min-height:100vh}
+.app{width:min(1200px,100%);margin:auto;padding:8px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:5px 4px 8px;border-bottom:1px solid #252b31}
+.brand{font-size:clamp(20px,3.2vw,32px);font-weight:950;letter-spacing:.4px}
+.brand span{color:var(--red)}
+.tagline{font-size:12px;color:#aab1b9;margin-top:2px}
+.gear{border:1px solid #353d46;background:#10151a;color:white;border-radius:10px;width:40px;height:36px;font-size:18px}
+
+.dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.mission{
+ background:linear-gradient(145deg,#11171d,#070b0f);
+ border:1px solid #303840;border-radius:14px;overflow:hidden;
+ box-shadow:0 10px 28px rgba(0,0,0,.30);
+}
+.missionHead{
+ position:relative;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ min-height:28px;
+ padding:8px 9px 2px;
+}
+.missionTitleRow{
+ position:relative;
+ width:100%;
+ min-width:0;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+.missionName{
+ font-weight:900;
+ font-size:clamp(13px,2vw,18px);
+ text-align:center;
+ line-height:1.1;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ max-width:calc(100% - 86px);
+}
+.due{font-size:9px;color:#9ea6ae}
+.missionEditBtn{
+ position:absolute;
+ right:0;
+ top:50%;
+ transform:translateY(-50%);
+ border:1px solid #39414a;background:#11171d;color:#cfd5da;border-radius:7px;
+ padding:4px 7px;font-size:8px;font-weight:900;cursor:pointer;white-space:nowrap;
+ z-index:2;
+}
+.missionEditBtn:hover{background:#1b232b;color:#fff;border-color:#68737e}
+
+.gauge{padding:0 3px}
+svg{display:block;width:100%;height:auto}
+.tick{stroke:#fff;stroke-linecap:round}.major{stroke-width:4}.minor{stroke-width:1.8;opacity:.84}
+.arcBase{fill:none;stroke:#20252a;stroke-width:10;stroke-linecap:round}
+.arcColorScale{fill:none;stroke-width:10;stroke-linecap:round}
+.arcProgress{fill:none;stroke:rgba(255,255,255,.035);stroke-width:2;stroke-linecap:round}
+.needleShadow{stroke:#4b0909;stroke-width:11;stroke-linecap:round;opacity:.45}
+.needle{stroke:#ff3030;stroke-width:6.5;stroke-linecap:round;filter:drop-shadow(0 1px 3px rgba(255,0,0,.4))}
+.hub{fill:#252a30;stroke:#858b91;stroke-width:1.5}.hub2{fill:#101419;stroke:#aaa;stroke-width:1}
+.dial{font-weight:900;text-anchor:middle}.money{text-anchor:middle;fill:#dfe2e5}
+.pct{font-size:29px;font-weight:950;text-anchor:middle;transition:fill .25s ease}.pct.red{fill:#ff3030}.pct.yellow{fill:#f1c31c}.pct.green{fill:#68d83f}
+.centerMoney{fill:#fff;font-size:12px;text-anchor:middle}
+.milestoneValue{font-size:8px;fill:#cfd4d9;text-anchor:middle;font-weight:700}
+.milestoneLabel{font-size:9px;fill:#fff;text-anchor:middle;font-weight:900}
+
+.summary{
+ display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #252b32;
+}
+.summaryCell{text-align:center;padding:6px 4px}.summaryCell:first-child{border-right:1px solid #252b32}
+.summaryLabel{font-size:8px;color:#9fa7b0;font-weight:850}
+.summaryValue{font-size:16px;font-weight:950;margin-top:2px}
+.summarySub{font-size:8px;color:#c2c7cc;margin-top:1px}
+.green{color:var(--green)}.yellow{color:var(--yellow)}
+
+.controls{border-top:1px solid #252b32;padding:7px 7px 8px}
+.controlGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.control input{
+ width:100%;min-width:0;background:#07090c;border:1px solid #414951;border-radius:7px;
+ color:#fff;text-align:center;font-size:14px;padding:8px 4px;outline:none;
+}
+.control input:focus{border-color:#7e8790}
+.control button{
+ width:100%;border:0;border-radius:7px;color:#fff;font-size:10px;font-weight:900;padding:8px 3px;margin-top:4px;
+}
+.add{background:#3aa91f}.withdraw{background:#c92d2d}
+.missionFoot{display:flex;justify-content:space-between;align-items:center;padding:5px 8px 7px;color:#7f8790;font-size:8px}
+.complete{color:var(--green);font-weight:900}
+
+ .blue{color:#4da3ff}.purple{color:#c15cff}.version{text-align:center;color:#737d87;font-size:9px;padding:8px 0}
+.missionTitleLink{background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit;font-weight:950;cursor:pointer}.missionTitleLink:hover{color:#67d83f}
+.missionLink{
+ display:block;width:100%;box-sizing:border-box;
+ background:transparent;border:0;border-top:1px solid #252c33;
+ color:#9da7b0;font:inherit;font-size:9px;text-align:center;
+ padding:5px 4px 6px;cursor:pointer;
+}
+.missionLink:hover{color:#fff;background:#151b21}
+.missionLink::before{content:"✎ ";color:#67d83f}
+
+
+
+.view{display:none}.view.active{display:block}
+.topNav{display:flex;gap:7px;align-items:center}
+.navBtn{border:1px solid #39414a;background:#11171d;color:#dfe4e8;border-radius:9px;padding:7px 10px;font-weight:800;font-size:11px}
+.navBtn.active{background:#2a333d;border-color:#64707c}
+.setupShell,.editorShell{
+ max-width:900px;margin:0 auto;background:linear-gradient(145deg,#11171d,#080b0f);
+ border:1px solid #303840;border-radius:15px;padding:18px;
+ box-shadow:0 10px 28px rgba(0,0,0,.30)
+}
+.setupIntro h1,.editorShell h1{margin:0 0 4px;font-size:26px}
+.setupIntro p{margin:0 0 10px;color:#aab1b9;font-size:12px}.setupIntro{margin-bottom:14px}.setupIntro .secondaryBtn{margin-bottom:2px}
+.missionForm{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
+.formGroup label{display:block;color:#aab1b9;font-size:9px;font-weight:850;margin:0 0 5px;text-transform:uppercase}
+.formGroup input,.formGroup select{
+ width:100%;box-sizing:border-box;background:#0d1217;border:1px solid #3a444e;color:white;
+ border-radius:9px;padding:10px;font-size:13px;outline:none
+}
+.formGroup input:focus{border-color:#6b7885}
+.primaryBtn,.saveBtn{border:0;border-radius:9px;padding:10px 14px;font-weight:950;color:white;background:#67d83f;cursor:pointer}
+.secondaryBtn{border:1px solid #4a555f;background:#151b21;color:#e8edf1;border-radius:9px;padding:10px 14px;font-weight:850;cursor:pointer}
+.dangerBtn{border:0;border-radius:9px;padding:10px 14px;font-weight:950;color:white;background:#ff4b55;cursor:pointer}
+.missionList{margin-top:16px;border-top:1px solid #303840}
+.missionRow{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #252c33}
+.missionRow strong{font-size:13px}.muted{color:#9ca5ad;font-size:10px}
+.editorGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+ .editorActions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px;flex-wrap:wrap}
+.editorActions .saveBtn{background:#67d83f}
+@media(max-width:700px){
+ .editorActions{display:grid;grid-template-columns:1fr 1fr}
+ .editorActions #deleteMission,.editorActions #cancelEdit{grid-column:auto}
+ .editorActions #saveStay,.editorActions #saveDashboard,.editorActions #saveControl{grid-column:1/-1}
+}
+.setupBack{margin-bottom:12px}
+@media(max-width:700px){
+ .missionForm{grid-template-columns:1fr 1fr}
+ .missionForm .wide{grid-column:1/-1}
+ .missionRow{grid-template-columns:1fr 1fr}
+ .missionRow .rowActions{grid-column:1/-1}
+ .editorGrid{grid-template-columns:1fr}
+}
+
+@media(min-width:950px){
+ .dashboard{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ .app{padding:4px}
+ .dashboard{gap:6px}
+ .mission{border-radius:12px}
+ .missionHead{padding:7px 7px 2px;min-height:25px}
+ .missionName{font-size:11px;max-width:calc(100% - 72px)}.due{font-size:7px}
+ .pct{font-size:24px}.centerMoney{font-size:9px}
+ .milestoneLabel{font-size:7px}.milestoneValue{font-size:6.5px}
+ .summaryCell{padding:5px 2px}
+ .summaryLabel{font-size:6.5px}.summaryValue{font-size:12px}.summarySub{font-size:6.5px}
+ .controls{padding:5px}
+ .control input{font-size:12px;padding:7px 2px}
+ .control button{font-size:8px;padding:7px 2px}
+ .missionFoot{font-size:6.5px;padding:4px 5px 6px}}
+
+.missionActions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.deleteBtn{
+  display:inline-flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  background:#e84d59;
+  border:1px solid #ff737c;
+  color:#fff;
+  border-radius:9px;
+  padding:9px 13px;
+  font-weight:800;
+  cursor:pointer;
+}
+.deleteBtn:hover{filter:brightness(1.08)}
+
+.missionRow{position:relative}
+.missionDragHandle{
+  width:28px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  color:#8f99a3;cursor:grab;user-select:none;touch-action:none;flex:0 0 28px;
+  border-radius:6px;
+}
+.missionDragHandle::before{content:"☰";font-size:19px;line-height:1;letter-spacing:-2px}
+.missionDragHandle:hover{color:#fff;background:#1b232b}
+.missionRow.dragging{opacity:.45}
+.missionRow.dragOver{outline:2px solid #67d83f;outline-offset:-2px}
+
+/* v0.9.2 — Dashboard gauges can be independently reordered */
+.missionTitleRow{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+}
+.dashboardDragHandle{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  flex:0 0 34px;
+  width:34px;height:18px;margin:0;
+  display:flex;align-items:center;justify-content:center;
+  color:#7f8993;cursor:grab;user-select:none;touch-action:none;
+  border:1px solid #303942;border-radius:7px;background:#0b1015;
+  font-size:14px;line-height:1;
+}
+.dashboardDragHandle::before{content:"☰";letter-spacing:-2px}
+.dashboardDragHandle:hover{color:#fff;background:#151c23;border-color:#5c6874}
+.dashboardDragHandle:active{cursor:grabbing}
+.mission.dashboardDragging{opacity:.48}
+.mission.dashboardDragOver{outline:2px solid #67d83f;outline-offset:-2px}
+.mission.dashboardDragOver .dashboardDragHandle{color:#67d83f;border-color:#67d83f}
+.dashboard .mission{transition:opacity .12s ease}
+@media(max-width:650px){
+  .missionTitleRow{gap:5px}
+  .dashboardDragHandle{flex-basis:30px;width:30px;height:17px;font-size:12px}
+}
+@media(max-width:700px){
+  .missionRow{grid-template-columns:1fr 1fr}
+  .missionRow .missionPrimary{display:flex;align-items:center;gap:7px}
+  .missionDragHandle{width:32px;min-width:32px}
+}
+
+</style>
+
+<style id="dashboard-nav-context-style">
+  body.dashboard-active #homeBtn { display: none !important; }
+</style>
+
+
+
+<style id="sf-home-css">
+#sfHome{display:none!important}
+body.sf-home .app{display:none!important}
+body.sf-home #sfHome{display:block!important}
+
+#sfHome{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(26,51,61,.30),transparent 38%),
+    linear-gradient(180deg,#030608 0%,#05090d 55%,#020405 100%);
+  color:#f5f7f8;
+  overflow:auto;
+}
+.sf-page{
+  width:min(1320px,100%);
+  margin:0 auto;
+  padding:18px 18px 20px;
+}
+.sf-top{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:16px;
+  margin-bottom:8px;
+}
+.sf-top-spacer{min-height:1px}
+.sf-logo{
+  text-align:center;
+  font-size:clamp(38px,4.6vw,66px);
+  line-height:.86;
+  letter-spacing:-2.5px;
+  font-weight:1000;
+  white-space:nowrap;
+}
+.sf-logo .savings{color:#f1f3f4}
+.sf-logo .fuel{color:#83ef10}
+.sf-tag{
+  text-align:center;
+  color:#83ef10;
+  font-weight:900;
+  font-size:clamp(11px,1.2vw,15px);
+  margin-top:7px;
+}
+.sf-hero-layout{
+  display:grid;
+  grid-template-columns:minmax(185px,245px) minmax(420px,1fr) minmax(185px,245px);
+  gap:18px;
+  align-items:start;
+}
+.sf-side{
+  display:grid;
+  grid-template-rows:repeat(4,1fr);
+  gap:10px;
+}
+.sf-example{
+  border:1px solid #26363e;
+  border-radius:13px;
+  background:linear-gradient(145deg,#0a141a,#071016);
+  box-shadow:0 8px 22px rgba(0,0,0,.38),inset 0 0 15px rgba(72,133,158,.045);
+  padding:8px 9px 9px;
+  min-height:150px;
+}
+.sf-example.complete{
+  border-color:#578c28;
+  box-shadow:0 0 22px rgba(128,239,16,.10);
+}
+.sf-example-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:950;
+  text-transform:uppercase;
+}
+.sf-example-head .pct{color:#83ef10}
+.sf-example-gauge{
+  height:86px;
+  margin:0 auto;
+}
+.sf-example-gauge svg{width:100%;height:100%;display:block}
+.sf-example-money{
+  text-align:center;
+  font-size:10px;
+  line-height:1.1;
+  margin-top:-1px;
+}
+.sf-example-money b{color:#83ef10}
+.sf-example-date{
+  color:#a3abb0;
+  text-align:center;
+  font-size:8px;
+  margin-top:4px;
+}
+.sf-center{
+  text-align:center;
+  padding:0 8px;
+}
+.sf-hero-gauge{
+  width:min(330px,70%);
+  margin:0 auto 2px;
+}
+.sf-hero-gauge svg{width:100%;height:auto;display:block}
+.sf-center-title{
+  margin:0;
+  font-size:clamp(38px,4.2vw,60px);
+  line-height:.88;
+  letter-spacing:-1.7px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+.sf-center-title span{display:block;color:#83ef10}
+.sf-copy{
+  margin:15px auto 12px;
+  max-width:570px;
+  font-size:clamp(12px,1.3vw,16px);
+  line-height:1.45;
+  color:#d3d8db;
+}
+.sf-copy b{color:#83ef10}
+.sf-main-actions{
+  width:min(100%,510px);
+  margin:0 auto;
+  display:grid;
+  gap:9px;
+}
+.sf-home-btn{
+  min-height:51px;
+  border-radius:12px;
+  padding:10px 18px;
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.3px;
+  cursor:pointer;
+}
+.sf-create{
+  border:1px solid #8cf21a;
+  background:linear-gradient(180deg,#9bf11b,#73d70a);
+  color:#0a1105;
+  box-shadow:0 7px 22px rgba(112,213,9,.18);
+}
+.sf-view{
+  border:1px solid #78dc14;
+  background:#071015;
+  color:#f3f6f7;
+}
+.sf-why{
+  width:min(100%,650px);
+  margin:18px auto 0;
+}
+.sf-section-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  justify-content:center;
+  color:#eef2f3;
+  font-size:13px;
+  font-weight:1000;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+.sf-section-title:before,.sf-section-title:after{
+  content:"";height:1px;background:#334049;flex:1;
+}
+.sf-section-title span{color:#83ef10}
+.sf-why-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-top:12px;
+}
+.sf-why-item{font-size:9px;color:#aab3b8;line-height:1.35}
+.sf-why-icon{
+  width:34px;height:34px;margin:0 auto 6px;
+  border:2px solid #83ef10;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#83ef10;font-size:17px;font-weight:900;
+}
+.sf-why-item b{
+  display:block;
+  text-align:center;
+  color:#83ef10;
+  font-size:10px;
+  margin-bottom:2px;
+}
+.sf-why-item p{text-align:center;margin:0}
+.sf-banner{
+  margin:18px auto 0;
+  width:min(100%,650px);
+  border:1px solid #263940;
+  border-radius:10px;
+  background:#071116;
+  padding:11px 16px;
+  text-align:center;
+  color:#f1f4f5;
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.3px;
+}
+.sf-banner .green{color:#83ef10}
+.sf-bottom{
+  width:min(100%,900px);
+  margin:16px auto 0;
+  padding-top:13px;
+  border-top:1px solid #202d34;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+.sf-bottom-item{
+  display:grid;
+  grid-template-columns:28px 1fr;
+  gap:7px;
+  align-items:start;
+  color:#8e999f;
+  font-size:9px;
+  line-height:1.35;
+}
+.sf-bottom-icon{
+  color:#83ef10;
+  font-size:22px;
+  line-height:1;
+  text-align:center;
+}
+.sf-bottom-item b{
+  display:block;color:#83ef10;font-size:9px;margin-bottom:2px;
+}
+#sfHomeBtn{
+  position:fixed;left:10px;top:10px;z-index:9999;
+  border:1px solid #34434e;background:#10171e;color:#dce5e8;
+  border-radius:8px;padding:6px 9px;font-size:10px;font-weight:900
+}
+body.sf-home #sfHomeBtn{display:none!important}
+body:not(.sf-home) #sfHomeBtn{display:block}
+
+@media(max-width:1000px){
+  .sf-page{padding:12px}
+  .sf-hero-layout{grid-template-columns:160px minmax(340px,1fr) 160px;gap:9px}
+  .sf-side{gap:7px}
+  .sf-example{min-height:128px;padding:6px}
+  .sf-example-gauge{height:70px}
+  .sf-example-head{font-size:9px}
+  .sf-example-money{font-size:8px}
+  .sf-example-date{font-size:7px}
+  .sf-center-title{font-size:42px}
+  .sf-hero-gauge{width:250px}
+  .sf-copy{font-size:11px;margin:9px auto}
+  .sf-home-btn{min-height:43px;font-size:10px}
+  .sf-why{margin-top:10px}
+  .sf-banner{margin-top:10px}
+  .sf-bottom{margin-top:10px;padding-top:8px}
+}
+@media(max-width:720px){
+  .sf-page{padding:10px}
+  .sf-top{display:block}
+  .sf-logo{font-size:40px}
+  .sf-hero-layout{grid-template-columns:1fr;gap:10px}
+  .sf-center{order:-1}
+  .sf-hero-gauge{width:230px}
+  .sf-center-title{font-size:38px}
+  .sf-side{grid-template-columns:1fr 1fr;grid-template-rows:none}
+  .sf-example{min-height:135px}
+  .sf-why-grid{grid-template-columns:repeat(2,1fr)}
+  .sf-bottom{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+
+<style id="sf-dashboard-title-css">
+.dashboardTitle{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:12px;margin:0 0 9px;padding:4px 4px 7px;border-bottom:1px solid #252b31;
+}
+.dashboardBrand{font-size:clamp(22px,3vw,34px);font-weight:950;letter-spacing:.2px}
+.dashboardBrand span{color:#82f10c}
+.dashboardSubtitle{font-size:11px;color:#9fa7b0;margin-top:3px}
+
+/* v1.5 iOS/PWA refinements */
+body{padding-bottom:env(safe-area-inset-bottom)}
+.app{padding-top:max(8px,env(safe-area-inset-top))}
+.sf-page{padding-top:max(14px,env(safe-area-inset-top))}
+.missionDragHandle,.dashboardDragHandle{touch-action:none;-webkit-user-select:none;user-select:none}
+@media(max-width:720px){
+  .sf-page{min-height:100svh;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));}
+  .sf-hero-layout{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+  .sf-center{grid-column:1/-1;grid-row:1;order:initial}
+  .sf-side{display:contents}
+  .sf-side .sf-example{min-height:126px}
+  .sf-side .sf-example:nth-child(odd){grid-column:1}
+  .sf-side .sf-example:nth-child(even){grid-column:2}
+  .sf-center-title{font-size:clamp(30px,9vw,42px)}
+  .sf-hero-gauge{width:min(220px,68vw)}
+  .sf-copy{font-size:12px;line-height:1.45}
+  .sf-home-btn{min-height:48px;font-size:11px}
+  .sf-bottom{grid-template-columns:1fr 1fr;gap:10px}
+  .sf-banner{font-size:10px}
+}
+@media(max-width:430px){
+  .sf-page{padding:8px}
+  .sf-side .sf-example{min-height:118px}
+  .sf-example-gauge{height:68px}
+  .sf-example-money{font-size:8px}
+  .sf-example-date{font-size:7px}
+  .sf-bottom-item{font-size:8px}
+  .sf-bottom-item b{font-size:8px}
+}
+</style>
+</head>
+<body class="sf-home">
+
+
+
+<div id="sfHome">
+  <div class="sf-page">
+    <div class="sf-top">
+      <div class="sf-top-spacer"></div>
+      <div>
+        <div class="sf-logo"><span class="savings">SAVINGS</span><span class="fuel">FUEL</span></div>
+        <div class="sf-tag">Fuel your financial goals.</div>
+      </div>
+      <div class="sf-top-spacer"></div>
+    </div>
+
+    <div class="sf-hero-layout">
+      <aside class="sf-side">
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>✦ Vacation</span><span class="pct">35%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(-25 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$1,240</b> of $3,500</div>
+        <div class="sf-example-date">Target: Sep 15, 2026</div>
+      </div>
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>▣ New Car</span><span class="pct">56%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(10 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$8,400</b> of $15,000</div>
+        <div class="sf-example-date">Target: May 1, 2027</div>
+      </div>
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>◆ College</span><span class="pct">42%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(-8 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$4,200</b> of $10,000</div>
+        <div class="sf-example-date">Target: Aug 2027</div>
+      </div>
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>⌂ Home Down Payment</span><span class="pct">51%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(1 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$12,750</b> of $25,000</div>
+        <div class="sf-example-date">Target: Dec 2027</div>
+      </div></aside>
+
+      <main class="sf-center">
+        <div class="sf-hero-gauge"><svg viewBox="0 0 380 215" preserveAspectRatio="xMidYMid meet"><path d="M 58 174 A 132 132 0 0 1 322 174" pathLength="100" fill="none" stroke="#ff2424" stroke-width="14" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 58 174 A 132 132 0 0 1 322 174" pathLength="100" fill="none" stroke="#ff8500" stroke-width="14" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 58 174 A 132 132 0 0 1 322 174" pathLength="100" fill="none" stroke="#ffe000" stroke-width="14" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 58 174 A 132 132 0 0 1 322 174" pathLength="100" fill="none" stroke="#83ef10" stroke-width="14" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="190" y1="174" x2="190" y2="59" stroke="#f5f7f8" stroke-width="5" stroke-linecap="round" transform="rotate(34 190 174)"/><circle cx="190" cy="174" r="11" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="190.0" y1="302.0" x2="190.0" y2="310.0" stroke="#e8edef" stroke-width="2" opacity=".85"/><line x1="280.5" y1="264.5" x2="286.2" y2="270.2" stroke="#e8edef" stroke-width="2" opacity=".85"/><line x1="318.0" y1="174.0" x2="326.0" y2="174.0" stroke="#e8edef" stroke-width="2" opacity=".85"/><line x1="280.5" y1="83.5" x2="286.2" y2="77.8" stroke="#e8edef" stroke-width="2" opacity=".85"/><line x1="190.0" y1="46.0" x2="190.0" y2="38.0" stroke="#e8edef" stroke-width="2" opacity=".85"/><g transform="translate(178,58)" stroke="#f3f5f6" fill="none" stroke-width="2.5"><rect x="0" y="3" width="13" height="20" rx="2"/><path d="M13 7h5l4 5v9h-4"/><path d="M3 7h7"/><path d="M6 23v5"/></g></svg></div>
+        <h1 class="sf-center-title">Your goals <span>need fuel.</span></h1>
+        <div class="sf-copy">
+          Your car has a fuel gauge. Your savings goals should too.<br>
+          See every tank. Know every target. <b>Fuel your future.</b>
+        </div>
+
+        <div class="sf-main-actions">
+          <button class="sf-home-btn sf-create" id="sfSetup">⛽ &nbsp; CREATE A SAVINGS TANK &nbsp; ›</button>
+          <button class="sf-home-btn sf-view" id="sfDash">◉ &nbsp; VIEW DASHBOARD &nbsp; ›</button>
+        </div>
+
+        <section class="sf-why">
+          <div class="sf-section-title">WHY <span>SAVINGSFUEL?</span></div>
+          <div class="sf-why-grid">
+            <div class="sf-why-item">
+              <div class="sf-why-icon">⌁</div><b>VISUAL PROGRESS</b><p>See your progress at a glance with fuel gauges.</p>
+            </div>
+            <div class="sf-why-item">
+              <div class="sf-why-icon">⛽</div><b>EASY TO FUEL</b><p>Add money in seconds. Watch your tank fill up.</p>
+            </div>
+            <div class="sf-why-item">
+              <div class="sf-why-icon">◎</div><b>STAY ON TRACK</b><p>Know exactly how much more you need to reach your goal.</p>
+            </div>
+            <div class="sf-why-item">
+              <div class="sf-why-icon">⚑</div><b>REACH THE GOAL</b><p>Fill the tank. Hit your target. Celebrate!</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="sf-banner">⛽ &nbsp; FILL THE TANK. REACH THE GOAL. <span class="green">FUEL YOUR FUTURE.</span></div>
+      </main>
+
+      <aside class="sf-side">
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>♡ Emergency Fund</span><span class="pct">37%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(-28 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$1,850</b> of $5,000</div>
+        <div class="sf-example-date">Target: Dec 31, 2026</div>
+      </div>
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>✓ Insurance</span><span class="pct">45%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(-10 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$340</b> of $760</div>
+        <div class="sf-example-date">Target: Mar 1, 2026</div>
+      </div>
+      <div class="sf-example ">
+        <div class="sf-example-head"><span>✈ Europe Trip</span><span class="pct">53%</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(4 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$2,100</b> of $4,000</div>
+        <div class="sf-example-date">Target: Jul 2026</div>
+      </div>
+      <div class="sf-example complete">
+        <div class="sf-example-head"><span>✚ Christmas</span><span class="pct">FULL TANK!</span></div>
+        <div class="sf-example-gauge"><svg viewBox="0 0 230 112" preserveAspectRatio="xMidYMid meet"><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff2424" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="0"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ff8500" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-25"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#ffe000" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-50"/><path d="M 37 91 A 78 78 0 0 1 193 91" pathLength="100" fill="none" stroke="#83ef10" stroke-width="10" stroke-linecap="butt" stroke-dasharray="25 75" stroke-dashoffset="-75"/><line x1="115" y1="91" x2="115" y2="30" stroke="#f5f7f8" stroke-width="3.5" stroke-linecap="round" transform="rotate(78 115 91)"/><circle cx="115" cy="91" r="7.5" fill="#101820" stroke="#8f9aa2" stroke-width="1.5"/><line x1="115.0" y1="165.0" x2="115.0" y2="173.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="143.3" x2="173.0" y2="149.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="189.0" y1="91.0" x2="197.0" y2="91.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="167.3" y1="38.7" x2="173.0" y2="33.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/><line x1="115.0" y1="17.0" x2="115.0" y2="9.0" stroke="#e8edef" stroke-width="1.2" opacity=".85"/></svg></div>
+        <div class="sf-example-money"><b>$1,000</b> of $1,000</div>
+        <div class="sf-example-date">FULL TANK • GOAL REACHED!</div>
+      </div></aside>
+    </div>
+
+    <div class="sf-bottom">
+      <div class="sf-bottom-item"><div class="sf-bottom-icon">♢</div><div><b>100% PRIVATE</b>Your data stays on your device.</div></div>
+      <div class="sf-bottom-item"><div class="sf-bottom-icon">⌑</div><div><b>SIMPLE & FAST</b>Built for real life. Designed for you.</div></div>
+      <div class="sf-bottom-item"><div class="sf-bottom-icon">▣</div><div><b>ANYTIME, ANYWHERE</b>Access your goals wherever you go.</div></div>
+      <div class="sf-bottom-item"><div class="sf-bottom-icon">$</div><div><b>FOCUS ON WHAT MATTERS</b>Your goals. Your future.</div></div>
+    </div>
+  </div>
+</div>
+
+<button id="sfHomeBtn" type="button">⌂ Home</button>
+<div class="app">
+<header>
+  <div>
+    <div class="brand">SAVINGS<span>FUEL</span></div>
+    <div class="tagline">Fuel your financial goals.</div>
+  </div>
+  <div class="topNav">
+    <button class="navBtn" id="homeBtn">View Savings Dashboard</button>
+    <button class="gear" id="gearBtn" title="Manage savings tanks">⚙</button>
+  </div>
+</header>
+
+<section id="dashboardView" class="view active">
+  <div class="dashboardTitle">
+    <div>
+      <div class="dashboardBrand">SAVINGS TANK <span>DASHBOARD</span></div>
+      <div class="dashboardSubtitle">All your savings tanks at a glance.</div>
+    </div>
+  </div>
+  <main id="dashboard" class="dashboard"></main>
+</section>
+
+<section id="setupView" class="view">
+  <div class="setupShell">
+    <div class="setupIntro">
+      <h1>Set Up Savings Tanks</h1>
+      <p>Create and manage the savings tanks that appear on your SavingsFuel dashboard.</p>
+      <button type="button" class="secondaryBtn" id="setupDashboardBtn">View Savings Dashboard</button>
+    </div>
+
+    <form id="missionForm" class="missionForm">
+      <div class="formGroup wide">
+        <label>Mission Name</label>
+        <input id="newName" required placeholder="e.g. Vacation">
+      </div>
+      <div class="formGroup">
+        <label>Target Amount</label>
+        <input id="newGoal" required type="number" min="0.01" step="0.01" placeholder="2500">
+      </div>
+      <div class="formGroup">
+        <label>Goal Date</label>
+        <input id="newDate" required type="date">
+      </div>
+      <div class="formGroup">
+        <label>Starting Balance</label>
+        <input id="newCurrent" type="number" min="0" step="0.01" value="0">
+      </div>
+      <button class="primaryBtn" type="submit">Create Savings Tank</button>
+    </form>
+
+    <div class="missionList" id="missionList"></div>
+  </div>
+</section>
+
+<section id="editorView" class="view">
+  <div class="editorShell">
+    <div class="setupBack"><button class="secondaryBtn" id="editorBack">← Back to Set Up Savings Tanks</button></div>
+    <h1>Edit Savings Tank</h1>
+    <p class="muted">Change the savings tank name, target, date, or balance. The gauge updates immediately when you save.</p>
+
+    <form id="editForm">
+      <input type="hidden" id="editId">
+      <div class="editorGrid">
+        <div class="formGroup">
+          <label>Mission Name</label>
+          <input id="editName" required>
+        </div>
+        <div class="formGroup">
+          <label>Target Amount</label>
+          <input id="editGoal" required type="number" min="0.01" step="0.01">
+        </div>
+        <div class="formGroup">
+          <label>Goal Date</label>
+          <input id="editDate" required type="date">
+        </div>
+        <div class="formGroup">
+          <label>Current Balance</label>
+          <input id="editCurrent" required type="number" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="editorActions">
+        <button type="button" class="dangerBtn" id="deleteMission">Delete Savings Tank</button>
+        <button type="button" class="secondaryBtn" id="cancelEdit">Cancel</button>
+        <button type="button" class="saveBtn" id="saveStay">Save Changes</button>
+        <button type="button" class="saveBtn" id="saveDashboard">Save Changes &amp; Exit to Dashboard</button>
+        <button type="button" class="saveBtn" id="saveControl">Save Changes &amp; Exit to Savings Tank Setup</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+
+
+</div>
+
+<script>
+const DEFAULT_MISSIONS = [
+  {id:"rent", name:"Rent", goal:1735, current:116.76, date:"2026-08-18"},
+  {id:"car", name:"Car Payment", goal:850, current:625, date:"2026-08-25"},
+  {id:"insurance", name:"Insurance", goal:760, current:340, date:"2026-09-01"},
+  {id:"emergency", name:"Emergency Fund", goal:5000, current:1850, date:"2026-12-31"}
+];
+
+let missions = loadMissions();
+let dashboardOrder = loadDashboardOrder();
+let editOrigin = "setupView";
+
+function loadMissions(){
+  try{
+    const saved = localStorage.getItem("missionfuel.missions");
+    if(saved){
+      const parsed = JSON.parse(saved);
+      if(Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  }catch(e){}
+  return DEFAULT_MISSIONS.map(m=>({...m}));
+}
+
+
+function loadDashboardOrder(){
+  const ids = missions.map(m=>String(m.id));
+  try{
+    const saved = localStorage.getItem("missionfuel.dashboardOrder");
+    if(saved){
+      const parsed = JSON.parse(saved);
+      if(Array.isArray(parsed)){
+        const valid = parsed.map(String).filter(id=>ids.includes(id));
+        ids.forEach(id=>{ if(!valid.includes(id)) valid.push(id); });
+        return valid;
+      }
+    }
+  }catch(e){}
+  return ids;
+}
+
+function syncDashboardOrder(){
+  const ids = missions.map(m=>String(m.id));
+  const valid = dashboardOrder.map(String).filter(id=>ids.includes(id));
+  ids.forEach(id=>{ if(!valid.includes(id)) valid.push(id); });
+  dashboardOrder = valid;
+}
+
+function saveDashboardOrder(){
+  syncDashboardOrder();
+  localStorage.setItem("missionfuel.dashboardOrder", JSON.stringify(dashboardOrder));
+}
+
+function orderedMissions(){
+  syncDashboardOrder();
+  const byId = new Map(missions.map(m=>[String(m.id),m]));
+  return dashboardOrder.map(id=>byId.get(String(id))).filter(Boolean);
+}
+
+function saveMissions(){
+  localStorage.setItem("missionfuel.missions", JSON.stringify(missions));
+  saveDashboardOrder();
+}
+
+const money=n=>"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const percent=m=>Math.max(0,Math.min(100,m.current/m.goal*100));
+
+function zoneClass(m){
+ const p=Math.max(0,Math.min(1,m.current/m.goal));
+ if(p < 0.25) return "red";
+ if(p < 0.50) return "yellow";
+ return "green";
+}
+
+function gaugeSVG(m,i){
+ const p=Math.max(0,Math.min(1,m.current/m.goal));
+ const gaugeCY=145;
+ const ang=(180-p*180)*Math.PI/180;
+ const x=150+149*Math.cos(ang), y=gaugeCY-149*Math.sin(ang);
+ const C=469;
+ let ticks="";
+ // 20 equal intervals across 180°. Major ticks land exactly at
+ // E, 1/4, 1/2, 3/4 and F.
+ for(let j=0;j<=20;j++){
+   const d=(180-j*9)*Math.PI/180;
+   const isMajor=(j%5===0);
+   const r1=isMajor?133:141, r2=149;
+   ticks+=`<line class="tick ${isMajor?"major":"minor"}"
+      x1="${150+r1*Math.cos(d)}" y1="${gaugeCY-r1*Math.sin(d)}"
+      x2="${150+r2*Math.cos(d)}" y2="${gaugeCY-r2*Math.sin(d)}"/>`;
+ }
+ const q1=m.goal*.25,q2=m.goal*.5,q3=m.goal*.75;
+ function mp(v){return Math.max(0,Math.min(1,v/m.goal));}
+ function milestone(deg,label,value){
+   const a=deg*Math.PI/180;
+   const r=103;
+   const x=150+r*Math.cos(a), y=151-r*Math.sin(a);
+   return `<text class="milestoneLabel" x="${x}" y="${y-1}">${label}</text>
+           <text class="milestoneValue" x="${x}" y="${y+10}">${money(value)}</text>`;
+ }
+ return `
+ <svg viewBox="0 0 300 190">
+  <defs>
+   <filter id="gaugeGlow${i}" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="1.2" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+   </filter>
+  </defs>
+  <path d="M10 145 A140 140 0 0 1 290 145 L272 145 A122 122 0 0 0 28 145Z"
+        fill="#090c10" stroke="#707780" stroke-width="2.5"/>
+  <path class="arcBase" d="M27 145 A123 123 0 0 1 273 145"/>
+  <!-- Permanent automotive-style color scale: red → orange → yellow → green -->
+  <!-- Exact fuel zones: each color occupies one quarter of the gauge -->
+  <path class="arcColorScale" d="M27 145 A123 123 0 0 1 63 58"
+        stroke="#ff2525" filter="url(#gaugeGlow${i})"/>
+  <path class="arcColorScale" d="M63 58 A123 123 0 0 1 150 22"
+        stroke="#f59b16" filter="url(#gaugeGlow${i})"/>
+  <path class="arcColorScale" d="M150 22 A123 123 0 0 1 237 58"
+        stroke="#f1d21b" filter="url(#gaugeGlow${i})"/>
+  <path class="arcColorScale" d="M237 58 A123 123 0 0 1 273 145"
+        stroke="#67d83f" filter="url(#gaugeGlow${i})"/>
+  <path class="arcProgress" d="M27 145 A123 123 0 0 1 273 145"
+        stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}"/>
+  <g>${ticks}</g>
+  ${milestone(135,"1/4",q1)}
+  ${milestone(90,"1/2",q2)}
+  ${milestone(45,"3/4",q3)}
+  <text x="47" y="154" fill="#ff3030" class="dial" font-size="13">E</text>
+  <text x="253" y="154" fill="#68d83f" class="dial" font-size="13">F</text>
+  <text x="150" y="91" class="pct ${zoneClass(m)}">${percent(m).toFixed(1)}%</text>
+  <text x="150" y="108" class="centerMoney">${money(m.current)} / ${money(m.goal)}</text>
+  <line class="needleShadow" x1="150" y1="${gaugeCY}" x2="${x}" y2="${y}"/>
+  <line class="needle" x1="150" y1="${gaugeCY}" x2="${x}" y2="${y}"/>
+  <circle class="hub" cx="150" cy="${gaugeCY}" r="12"/><circle class="hub2" cx="150" cy="${gaugeCY}" r="7"/>
+ </svg>`;
+}
+
+function renderCard(m,i){
+ const remaining=Math.max(m.goal-m.current,0);
+ const complete=m.current>=m.goal;
+ return `
+ <article class="mission" data-index="${i}" data-mission-id="${m.id}" draggable="false">
+  <div class="missionHead">
+    <div class="missionTitleRow">
+      <div class="dashboardDragHandle" draggable="false" title="Drag to reposition this gauge" aria-label="Drag to reposition this gauge"></div>
+      <div class="missionName">${escapeHtml(m.name)}</div>
+    </div>
+    <button class="missionEditBtn" data-edit="${m.id}" type="button" title="Edit this mission">✎ Edit</button>
+  </div>
+  <div class="gauge">${gaugeSVG(m,i)}</div>
+  <div class="summary">
+   <div class="summaryCell">
+    <div class="summaryLabel">CURRENT BALANCE</div>
+    <div class="summaryValue green">${money(m.current)}</div>
+    <div class="summarySub">${percent(m).toFixed(2)}%</div>
+   </div>
+   <div class="summaryCell">
+    <div class="summaryLabel">REMAINING</div>
+    <div class="summaryValue">${money(remaining)}</div>
+    <div class="summarySub">${complete?"MISSION COMPLETE":"to target"}</div>
+   </div>
+  </div>
+  <div class="controls">
+   <div class="controlGrid">
+    <div class="control">
+     <input class="addInput" inputmode="decimal" type="number" step="0.01" placeholder="$ amount">
+     <button class="add" data-action="add">ADD</button>
+    </div>
+    <div class="control">
+     <input class="withdrawInput" inputmode="decimal" type="number" step="0.01" placeholder="$ amount">
+     <button class="withdraw" data-action="withdraw">WITHDRAW</button>
+    </div>
+   </div>
+  </div>
+  <div class="missionFoot">
+   <span>${complete?'<span class="complete">● FULL</span>':'Next: '+money(Math.max(m.goal*.25-m.current,0))+' to 1/4'}</span>
+   <span>${m.due}</span>
+  </div>
+ </article>`;
+}
+function formatDate(v){
+  if(!v) return "";
+  const d = new Date(v+"T00:00:00");
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+}
+
+function render(){
+  document.getElementById("dashboard").innerHTML=orderedMissions().map(renderCard).join("");
+  renderMissionList();
+  saveMissions();
+}
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(name).classList.add("active");
+  document.body.classList.toggle("dashboard-active", name === "dashboardView");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderMissionList(){
+  const list=document.getElementById("missionList");
+  list.innerHTML=missions.map(m=>`
+    <div class="missionRow" draggable="true" data-mission-id="${m.id}">
+      <div class="missionPrimary">
+        <span class="missionDragHandle" draggable="false" title="Drag to reorder" aria-label="Drag to reorder"></span>
+        <div><strong>${escapeHtml(m.name)}</strong><div class="muted">Goal ${money(m.goal)} • ${formatDate(m.date)}</div></div>
+      </div>
+      <div><div class="muted">Current</div><strong>${money(m.current)}</strong></div>
+      <div><div class="muted">Progress</div><strong>${percent(m).toFixed(1)}%</strong></div>
+      <div class="rowActions">
+        <button class="secondaryBtn editMission" data-id="${m.id}" type="button">Edit</button>
+        <button class="deleteBtn deleteMissionRow" data-id="${m.id}" type="button">Delete</button>
+      </div>
+    </div>`).join("");
+}
+
+
+/* Set Up Savings Tanks: drag-and-drop mission ordering */
+let missionDragId = null;
+let missionTouchDrag = null;
+
+function reorderMissions(fromId, toId){
+  const from = missions.findIndex(m=>String(m.id)===String(fromId));
+  const to = missions.findIndex(m=>String(m.id)===String(toId));
+  if(from < 0 || to < 0 || from === to) return;
+  const [moved] = missions.splice(from,1);
+  missions.splice(to,0,moved);
+  render(); // render() also persists the new order.
+}
+
+document.getElementById("missionList").addEventListener("dragstart", e=>{
+  const row=e.target.closest(".missionRow");
+  if(!row) return;
+  missionDragId=row.dataset.missionId;
+  row.classList.add("dragging");
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed="move";
+    e.dataTransfer.setData("text/plain",missionDragId);
+  }
+});
+
+document.getElementById("missionList").addEventListener("dragover", e=>{
+  const row=e.target.closest(".missionRow");
+  if(!row || !missionDragId || row.dataset.missionId===missionDragId) return;
+  e.preventDefault();
+  document.querySelectorAll("#missionList .missionRow.dragOver").forEach(x=>x.classList.remove("dragOver"));
+  row.classList.add("dragOver");
+  if(e.dataTransfer) e.dataTransfer.dropEffect="move";
+});
+
+document.getElementById("missionList").addEventListener("drop", e=>{
+  const row=e.target.closest(".missionRow");
+  if(!row || !missionDragId || row.dataset.missionId===missionDragId) return;
+  e.preventDefault();
+  const targetId=row.dataset.missionId;
+  reorderMissions(missionDragId,targetId);
+  missionDragId=null;
+});
+
+document.getElementById("missionList").addEventListener("dragend", e=>{
+  document.querySelectorAll("#missionList .missionRow.dragging,#missionList .missionRow.dragOver")
+    .forEach(x=>x.classList.remove("dragging","dragOver"));
+  missionDragId=null;
+});
+
+/* iPhone/iPad-friendly pointer dragging from the three-line handle. */
+document.getElementById("missionList").addEventListener("pointerdown", e=>{
+  const handle=e.target.closest(".missionDragHandle");
+  if(!handle) return;
+  const row=handle.closest(".missionRow");
+  if(!row) return;
+  missionTouchDrag={
+    id:row.dataset.missionId,row,startY:e.clientY,active:false,pointerId:e.pointerId
+  };
+  handle.setPointerCapture?.(e.pointerId);
+});
+
+document.getElementById("missionList").addEventListener("pointermove", e=>{
+  if(!missionTouchDrag || e.pointerId!==missionTouchDrag.pointerId) return;
+  if(!missionTouchDrag.active && Math.abs(e.clientY-missionTouchDrag.startY)<8) return;
+  missionTouchDrag.active=true;
+  missionTouchDrag.row.classList.add("dragging");
+
+  const rows=[...document.querySelectorAll("#missionList .missionRow")]
+    .filter(r=>r!==missionTouchDrag.row);
+  const target=rows.find(r=>{
+    const b=r.getBoundingClientRect();
+    return e.clientY>=b.top && e.clientY<=b.bottom;
+  });
+
+  document.querySelectorAll("#missionList .missionRow.dragOver")
+    .forEach(x=>x.classList.remove("dragOver"));
+  if(target) target.classList.add("dragOver");
+  e.preventDefault();
+});
+
+document.getElementById("missionList").addEventListener("pointerup", e=>{
+  if(!missionTouchDrag || e.pointerId!==missionTouchDrag.pointerId) return;
+  const state=missionTouchDrag;
+  const target=document.querySelector("#missionList .missionRow.dragOver");
+
+  if(state.active && target && target.dataset.missionId!==state.id){
+    reorderMissions(state.id,target.dataset.missionId);
+  }
+
+  document.querySelectorAll("#missionList .missionRow.dragging,#missionList .missionRow.dragOver")
+    .forEach(x=>x.classList.remove("dragging","dragOver"));
+  missionTouchDrag=null;
+});
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+
+
+
+
+/* v0.9.2 — independently reorder gauges on the dashboard */
+let dashboardDragId = null;
+let dashboardTouchDrag = null;
+
+function reorderDashboard(fromId,toId){
+  syncDashboardOrder();
+  const from=dashboardOrder.findIndex(id=>String(id)===String(fromId));
+  const to=dashboardOrder.findIndex(id=>String(id)===String(toId));
+  if(from<0 || to<0 || from===to) return;
+  const [moved]=dashboardOrder.splice(from,1);
+  dashboardOrder.splice(to,0,moved);
+  saveDashboardOrder();
+  render();
+}
+
+document.getElementById("dashboard").addEventListener("dragstart",e=>{
+  const handle=e.target.closest(".dashboardDragHandle");
+  if(!handle) return;
+  const card=handle.closest(".mission");
+  if(!card) return;
+  dashboardDragId=card.dataset.missionId;
+  card.classList.add("dashboardDragging");
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed="move";
+    e.dataTransfer.setData("text/plain",dashboardDragId);
+  }
+});
+
+document.getElementById("dashboard").addEventListener("dragover",e=>{
+  const card=e.target.closest(".mission");
+  if(!card || !dashboardDragId || card.dataset.missionId===dashboardDragId) return;
+  e.preventDefault();
+  document.querySelectorAll("#dashboard .dashboardDragOver")
+    .forEach(x=>x.classList.remove("dashboardDragOver"));
+  card.classList.add("dashboardDragOver");
+  if(e.dataTransfer) e.dataTransfer.dropEffect="move";
+});
+
+document.getElementById("dashboard").addEventListener("drop",e=>{
+  const card=e.target.closest(".mission");
+  if(!card || !dashboardDragId || card.dataset.missionId===dashboardDragId) return;
+  e.preventDefault();
+  reorderDashboard(dashboardDragId,card.dataset.missionId);
+  dashboardDragId=null;
+});
+
+document.getElementById("dashboard").addEventListener("dragend",()=>{
+  document.querySelectorAll("#dashboard .dashboardDragging,#dashboard .dashboardDragOver")
+    .forEach(x=>x.classList.remove("dashboardDragging","dashboardDragOver"));
+  dashboardDragId=null;
+});
+
+/* Touch/pointer support for iPhone and iPad */
+document.getElementById("dashboard").addEventListener("pointerdown",e=>{
+  const handle=e.target.closest(".dashboardDragHandle");
+  if(!handle) return;
+  const card=handle.closest(".mission");
+  if(!card) return;
+
+  dashboardTouchDrag={
+    id:card.dataset.missionId,
+    card,
+    startX:e.clientX,
+    startY:e.clientY,
+    active:false,
+    pointerId:e.pointerId
+  };
+  handle.setPointerCapture?.(e.pointerId);
+});
+
+document.getElementById("dashboard").addEventListener("pointermove",e=>{
+  if(!dashboardTouchDrag || e.pointerId!==dashboardTouchDrag.pointerId) return;
+
+  const dx=e.clientX-dashboardTouchDrag.startX;
+  const dy=e.clientY-dashboardTouchDrag.startY;
+  if(!dashboardTouchDrag.active && Math.hypot(dx,dy)<8) return;
+
+  dashboardTouchDrag.active=true;
+  dashboardTouchDrag.card.classList.add("dashboardDragging");
+
+  const cards=[...document.querySelectorAll("#dashboard .mission")]
+    .filter(c=>c!==dashboardTouchDrag.card);
+
+  const target=cards.find(c=>{
+    const b=c.getBoundingClientRect();
+    return e.clientX>=b.left && e.clientX<=b.right &&
+           e.clientY>=b.top && e.clientY<=b.bottom;
+  });
+
+  document.querySelectorAll("#dashboard .dashboardDragOver")
+    .forEach(x=>x.classList.remove("dashboardDragOver"));
+  if(target) target.classList.add("dashboardDragOver");
+
+  e.preventDefault();
+});
+
+document.getElementById("dashboard").addEventListener("pointerup",e=>{
+  if(!dashboardTouchDrag || e.pointerId!==dashboardTouchDrag.pointerId) return;
+
+  const state=dashboardTouchDrag;
+  const target=document.querySelector("#dashboard .dashboardDragOver");
+
+  if(state.active && target && target.dataset.missionId!==state.id){
+    reorderDashboard(state.id,target.dataset.missionId);
+  }
+
+  document.querySelectorAll("#dashboard .dashboardDragging,#dashboard .dashboardDragOver")
+    .forEach(x=>x.classList.remove("dashboardDragging","dashboardDragOver"));
+  dashboardTouchDrag=null;
+});
+
+document.getElementById("dashboard").addEventListener("pointercancel",e=>{
+  if(!dashboardTouchDrag || e.pointerId!==dashboardTouchDrag.pointerId) return;
+  document.querySelectorAll("#dashboard .dashboardDragging,#dashboard .dashboardDragOver")
+    .forEach(x=>x.classList.remove("dashboardDragging","dashboardDragOver"));
+  dashboardTouchDrag=null;
+});
+
+
+document.getElementById("dashboard").addEventListener("click",e=>{
+  const link=e.target.closest(".missionLink, .missionTitleLink, .missionEditBtn");
+  if(!link)return;
+  const m=missions.find(x=>x.id===link.dataset.edit);
+  if(!m)return;
+  document.getElementById("editId").value=m.id;
+  document.getElementById("editName").value=m.name;
+  document.getElementById("editGoal").value=m.goal;
+  document.getElementById("editDate").value=m.date;
+  document.getElementById("editCurrent").value=m.current;
+  editOrigin = "dashboardView";
+  showView("editorView");
+});
+
+document.getElementById("homeBtn").addEventListener("click",()=>showView("dashboardView"));
+document.getElementById("setupDashboardBtn").addEventListener("click",()=>showView("dashboardView"));
+document.getElementById("gearBtn").addEventListener("click",()=>showView("setupView"));
+
+document.getElementById("missionForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("newName").value.trim();
+  const goal=parseFloat(document.getElementById("newGoal").value);
+  const date=document.getElementById("newDate").value;
+  const current=Math.max(0,parseFloat(document.getElementById("newCurrent").value)||0);
+  if(!name||!Number.isFinite(goal)||goal<=0||!date)return;
+  const newMission={id:"m_"+Date.now(),name,goal,current:Math.min(current,goal),date};
+  missions.push(newMission);
+  dashboardOrder.push(String(newMission.id));
+  e.target.reset();
+  document.getElementById("newCurrent").value="0";
+  render();
+  showView("setupView");
+});
+
+document.getElementById("missionList").addEventListener("click",e=>{
+  const editBtn=e.target.closest(".editMission");
+  if(editBtn){
+    const m=missions.find(x=>String(x.id)===String(editBtn.dataset.id));
+    if(!m)return;
+    document.getElementById("editId").value=m.id;
+    document.getElementById("editName").value=m.name;
+    document.getElementById("editGoal").value=m.goal;
+    document.getElementById("editDate").value=m.date;
+    document.getElementById("editCurrent").value=m.current;
+    editOrigin = "setupView";
+    showView("editorView");
+    return;
+  }
+
+  const deleteBtn=e.target.closest(".deleteMissionRow");
+  if(deleteBtn){
+    const m=missions.find(x=>String(x.id)===String(deleteBtn.dataset.id));
+    if(!m)return;
+    if(!confirm(`Delete "${m.name}"? This cannot be undone.`))return;
+    missions=missions.filter(x=>String(x.id)!==String(m.id));
+    dashboardOrder=dashboardOrder.filter(id=>String(id)!==String(m.id));
+    saveMissions();
+    render();
+    showView("setupView");
+  }
+});
+
+function saveEditedMission(){
+  const m=missions.find(x=>x.id===document.getElementById("editId").value);
+  if(!m)return false;
+
+  const name=document.getElementById("editName").value.trim();
+  const goal=parseFloat(document.getElementById("editGoal").value);
+  const date=document.getElementById("editDate").value;
+  const current=parseFloat(document.getElementById("editCurrent").value);
+
+  if(!name || !Number.isFinite(goal) || goal<=0 || !date || !Number.isFinite(current)){
+    document.getElementById("editForm").reportValidity();
+    return false;
+  }
+
+  m.name=name;
+  m.goal=Math.max(0.01,goal);
+  m.date=date;
+  m.current=Math.min(Math.max(0,current),m.goal);
+  saveMissions();
+  render();
+  return true;
+}
+
+document.getElementById("editForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  saveEditedMission(); // Save Changes intentionally stays on this edit page.
+});
+
+document.getElementById("saveStay").addEventListener("click",()=>{
+  saveEditedMission();
+});
+
+document.getElementById("saveDashboard").addEventListener("click",()=>{
+  if(saveEditedMission()) showView("dashboardView");
+});
+
+document.getElementById("saveControl").addEventListener("click",()=>{
+  if(saveEditedMission()) showView("setupView");
+});
+
+function closeEditor(){
+  showView(editOrigin);
+}
+document.getElementById("cancelEdit").addEventListener("click",closeEditor);
+document.getElementById("editorBack").addEventListener("click",closeEditor);
+
+document.getElementById("deleteMission").addEventListener("click",()=>{
+  const id=document.getElementById("editId").value;
+  const m=missions.find(x=>String(x.id)===String(id));
+  if(!m)return;
+  if(!confirm(`Delete "${m.name}"? This cannot be undone.`))return;
+  missions=missions.filter(x=>String(x.id)!==String(id));
+  dashboardOrder=dashboardOrder.filter(mid=>String(mid)!==String(id));
+  saveMissions();
+  render();
+  showView("setupView");
+});
+
+render();
+
+function animateMission(mission, from, to, duration=1250){
+ const start = performance.now();
+
+ function frame(now){
+   const t = Math.min(1, (now - start) / duration);
+   // Smooth ease-out: quick initial movement, then a natural settle.
+   const eased = 1 - Math.pow(1 - t, 3);
+   mission.current = from + (to - from) * eased;
+   render();
+
+   if(t < 1){
+     requestAnimationFrame(frame);
+   } else {
+     mission.current = to;
+     render();
+   }
+ }
+ requestAnimationFrame(frame);
+}
+
+
+document.getElementById("dashboard").addEventListener("click",e=>{
+ const btn=e.target.closest("button[data-action]");
+ if(!btn)return;
+
+ const card=btn.closest(".mission");
+ const m=missions.find(x=>String(x.id)===String(card.dataset.missionId));
+ if(!m)return;
+ const input=btn.dataset.action==="add"
+   ? card.querySelector(".addInput")
+   : card.querySelector(".withdrawInput");
+
+ const amount=parseFloat(input.value);
+ if(!Number.isFinite(amount)||amount<=0)return;
+
+ const from=m.current;
+ const to=btn.dataset.action==="add"
+   ? Math.min(m.goal, from+amount)
+   : Math.max(0, from-amount);
+
+ input.value="";
+ animateMission(m, from, to);
+ setTimeout(saveMissions, 1300);
+});
+</script>
+
+<script>
+(function(){
+ function app(view){
+  document.body.classList.remove("sf-home");
+  if(typeof showView==="function") showView(view);
+  window.scrollTo({top:0,behavior:"instant"});
+}
+ function home(){document.body.classList.add("sf-home");window.scrollTo(0,0);}
+ document.getElementById("sfSetup")?.addEventListener("click",()=>app("setupView"));
+ document.getElementById("sfDash")?.addEventListener("click",()=>app("dashboardView"));
+ document.getElementById("sfHomeBtn")?.addEventListener("click",home);
+})();
+</script>
+<script>
+// v1.5: register the offline PWA shell when served over HTTPS/localhost.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
