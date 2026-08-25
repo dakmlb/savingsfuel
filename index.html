@@ -6,11 +6,12 @@
 <meta name="theme-color" content="#050608">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SavingsFuel">
+<meta name="apple-mobile-web-app-title" content="MissionGauge">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<title>SavingsFuel v1.5 — iOS / PWA Edition</title>
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>MissionGauge v1.6.2 — iOS / PWA Edition</title>
 <style>
 :root{
  --bg:#050608;--card:#0d1116;--card2:#11161c;--line:#2d343d;
@@ -74,7 +75,7 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 }
 .missionEditBtn:hover{background:#1b232b;color:#fff;border-color:#68737e}
 
-.gauge{padding:0 3px}
+.gauge{padding:0 3px;cursor:pointer}
 svg{display:block;width:100%;height:auto}
 .tick{stroke:#fff;stroke-linecap:round}.major{stroke-width:4}.minor{stroke-width:1.8;opacity:.84}
 .arcBase{fill:none;stroke:#20252a;stroke-width:10;stroke-linecap:round}
@@ -562,6 +563,41 @@ body{padding-bottom:env(safe-area-inset-bottom)}
   .sf-bottom-item b{font-size:8px}
 }
 </style>
+
+<style id="sf-mobile-v161">
+.sf-mobile-hint{display:none}
+.sf-fullscreen-gauge{
+  position:fixed;inset:0;z-index:10050;display:none;
+  background:#05090d;color:#f4f7f8;
+  padding:max(10px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));
+  touch-action:pan-y;
+}
+.sf-fullscreen-gauge.open{display:flex;flex-direction:column}
+body.sf-fullscreen-open{overflow:hidden}
+.sf-fs-head{display:flex;align-items:center;gap:8px}
+.sf-fs-head button{width:44px;height:44px;border:1px solid #35464f;background:#0c151c;color:#eef4f6;border-radius:10px;font-size:22px;font-weight:900}
+.sf-fs-name{flex:1;text-align:center;font-size:20px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sf-fs-stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.sf-fs-stage .sf-fs-gauge{width:min(94vw,560px)}
+.sf-fs-gauge svg{width:100%;height:auto;display:block}
+.sf-fs-percent{font-size:44px;font-weight:1000;color:#82f10c;line-height:1}
+.sf-fs-amount{font-size:18px;font-weight:850;margin-top:7px}
+.sf-fs-date{font-size:13px;color:#9ba8af;margin-top:5px}
+.sf-fs-nav{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 0 3px}
+.sf-fs-nav button{width:52px;height:48px;border:1px solid #3b4c55;background:#0b151c;color:#f3f6f7;border-radius:12px;font-size:23px}
+.sf-fs-dots{display:flex;gap:6px;max-width:230px;overflow:hidden;align-items:center;justify-content:center}
+.sf-fs-dot{width:7px;height:7px;border-radius:50%;background:#53636c;flex:0 0 auto}
+.sf-fs-dot.active{width:20px;border-radius:5px;background:#82f10c}
+.sf-fs-status{margin-top:10px;font-size:13px;font-weight:950;letter-spacing:.8px;color:#67d83f;text-transform:uppercase;min-height:18px}
+.sf-fs-swipe-hint{font-size:10px;color:#65737c;text-align:center;padding:0 0 4px;opacity:.9}
+.sf-fs-stage.slide-left{animation:sfSlideLeft .18s ease}
+.sf-fs-stage.slide-right{animation:sfSlideRight .18s ease}
+@keyframes sfSlideLeft{from{opacity:.35;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sfSlideRight{from{opacity:.35;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+.sf-fullscreen-gauge button{touch-action:manipulation}
+@media(max-width:700px){
+  .sf-mobile-hint{display:flex;justify-content:center;gap:8px;color:#8d9ba2;font-size:10px;margin:4px 0 8px}
+}
 </head>
 <body class="sf-home">
 
@@ -769,6 +805,28 @@ body{padding-bottom:env(safe-area-inset-bottom)}
 
 
 
+</div>
+
+<!-- v1.6.2 — Full-screen MissionGauge viewer with iPhone/iPad swipe navigation -->
+<div id="sfFullscreenGauge" class="sf-fullscreen-gauge" aria-hidden="true">
+  <div class="sf-fs-head">
+    <button type="button" id="sfFsClose" aria-label="Back to dashboard">←</button>
+    <div class="sf-fs-name" id="sfFsName">Mission</div>
+    <button type="button" id="sfFsHome" aria-label="Back to dashboard">⌂</button>
+  </div>
+  <div class="sf-fs-stage" id="sfFsStage">
+    <div class="sf-fs-gauge" id="sfFsGauge"></div>
+    <div class="sf-fs-percent" id="sfFsPercent">0.0%</div>
+    <div class="sf-fs-amount" id="sfFsAmount">$0.00 / $0.00</div>
+    <div class="sf-fs-date" id="sfFsDate"></div>
+    <div class="sf-fs-status" id="sfFsStatus"></div>
+  </div>
+  <div class="sf-fs-nav">
+    <button type="button" id="sfFsPrev" aria-label="Previous mission">‹</button>
+    <div class="sf-fs-dots" id="sfFsDots" aria-label="Mission position"></div>
+    <button type="button" id="sfFsNext" aria-label="Next mission">›</button>
+  </div>
+  <div class="sf-fs-swipe-hint">Swipe left or right to move between missions</div>
 </div>
 
 <script>
@@ -1085,6 +1143,128 @@ function escapeHtml(s){
 
 
 
+
+
+/* v1.6.2 — Tap a dashboard gauge for a full-screen viewer; swipe between missions. */
+let sfFullscreenIndex = 0;
+let sfSwipeStartX = 0;
+let sfSwipeStartY = 0;
+let sfSwipeTracking = false;
+
+function sfFullscreenMissions(){
+  return orderedMissions();
+}
+
+function sfRenderFullscreen(index, direction=0){
+  const list=sfFullscreenMissions();
+  if(!list.length) return;
+  sfFullscreenIndex=((index%list.length)+list.length)%list.length;
+  const m=list[sfFullscreenIndex];
+  const p=Math.max(0,Math.min(100,m.current/m.goal*100));
+  const complete=m.current>=m.goal;
+  const remaining=Math.max(m.goal-m.current,0);
+
+  const stage=document.getElementById('sfFsStage');
+  const gauge=document.getElementById('sfFsGauge');
+  gauge.innerHTML=gaugeSVG(m,900+sfFullscreenIndex);
+  document.getElementById('sfFsName').textContent=m.name;
+  document.getElementById('sfFsPercent').textContent=p.toFixed(1)+'%';
+  document.getElementById('sfFsAmount').textContent=money(m.current)+' / '+money(m.goal)+' • '+money(remaining)+' remaining';
+  document.getElementById('sfFsDate').textContent=m.date ? 'Target: '+formatDate(m.date) : '';
+  document.getElementById('sfFsStatus').textContent=complete ? 'MISSION ACCOMPLISHED • FULL' : '';
+
+  const dots=document.getElementById('sfFsDots');
+  dots.innerHTML=list.map((_,i)=>`<span class="sf-fs-dot ${i===sfFullscreenIndex?'active':''}" aria-hidden="true"></span>`).join('');
+  document.getElementById('sfFsPrev').disabled=list.length<2;
+  document.getElementById('sfFsNext').disabled=list.length<2;
+
+  if(direction){
+    stage.classList.remove('slide-left','slide-right');
+    void stage.offsetWidth;
+    stage.classList.add(direction>0?'slide-left':'slide-right');
+  }
+}
+
+function sfOpenFullscreen(missionId){
+  const list=sfFullscreenMissions();
+  const idx=list.findIndex(m=>String(m.id)===String(missionId));
+  if(idx<0) return;
+  sfFullscreenIndex=idx;
+  const overlay=document.getElementById('sfFullscreenGauge');
+  sfRenderFullscreen(idx);
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.classList.add('sf-fullscreen-open');
+  document.body.style.overflow='hidden';
+}
+
+function sfCloseFullscreen(){
+  const overlay=document.getElementById('sfFullscreenGauge');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.classList.remove('sf-fullscreen-open');
+  document.body.style.overflow='';
+}
+
+function sfMoveFullscreen(delta){
+  const list=sfFullscreenMissions();
+  if(list.length<2) return;
+  sfRenderFullscreen(sfFullscreenIndex+delta,delta);
+}
+
+// Tap the gauge itself — controls, edit, and drag handle remain independent.
+document.getElementById('dashboard').addEventListener('click',e=>{
+  if(e.target.closest('button,input,.dashboardDragHandle')) return;
+  const gauge=e.target.closest('.mission .gauge');
+  if(!gauge) return;
+  const card=gauge.closest('.mission');
+  if(card) sfOpenFullscreen(card.dataset.missionId);
+});
+
+document.getElementById('sfFsClose').addEventListener('click',sfCloseFullscreen);
+document.getElementById('sfFsHome').addEventListener('click',sfCloseFullscreen);
+document.getElementById('sfFsPrev').addEventListener('click',()=>sfMoveFullscreen(-1));
+document.getElementById('sfFsNext').addEventListener('click',()=>sfMoveFullscreen(1));
+
+// iPhone/iPad swipe navigation. A horizontal movement of at least 55px
+// wins over a small vertical movement and changes one mission at a time.
+const sfOverlay=document.getElementById('sfFullscreenGauge');
+sfOverlay.addEventListener('touchstart',e=>{
+  if(!e.touches.length) return;
+  const t=e.touches[0];
+  sfSwipeStartX=t.clientX;
+  sfSwipeStartY=t.clientY;
+  sfSwipeTracking=true;
+},{passive:true});
+
+sfOverlay.addEventListener('touchmove',e=>{
+  if(!sfSwipeTracking || !e.touches.length) return;
+  const t=e.touches[0];
+  const dx=t.clientX-sfSwipeStartX;
+  const dy=t.clientY-sfSwipeStartY;
+  if(Math.abs(dx)>Math.abs(dy) && Math.abs(dx)>18) e.preventDefault();
+},{passive:false});
+
+sfOverlay.addEventListener('touchend',e=>{
+  if(!sfSwipeTracking) return;
+  sfSwipeTracking=false;
+  const t=e.changedTouches && e.changedTouches[0];
+  if(!t) return;
+  const dx=t.clientX-sfSwipeStartX;
+  const dy=t.clientY-sfSwipeStartY;
+  if(Math.abs(dx)>=55 && Math.abs(dx)>Math.abs(dy)*1.15){
+    sfMoveFullscreen(dx<0 ? 1 : -1);
+  }
+},{passive:true});
+
+// Keyboard support makes desktop testing easy while preserving the same behavior.
+document.addEventListener('keydown',e=>{
+  const open=document.getElementById('sfFullscreenGauge').classList.contains('open');
+  if(!open) return;
+  if(e.key==='Escape') sfCloseFullscreen();
+  else if(e.key==='ArrowLeft') sfMoveFullscreen(-1);
+  else if(e.key==='ArrowRight') sfMoveFullscreen(1);
+});
 
 /* v0.9.2 — independently reorder gauges on the dashboard */
 let dashboardDragId = null;
