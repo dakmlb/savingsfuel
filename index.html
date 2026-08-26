@@ -89,13 +89,14 @@ svg{display:block;width:100%;height:auto}
 .milestoneValue{font-size:8px;fill:#cfd4d9;text-anchor:middle;font-weight:700}
 .milestoneLabel{font-size:9px;fill:#fff;text-anchor:middle;font-weight:900}
 
-.summary{
- display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #252b32;
-}
-.summaryCell{text-align:center;padding:5px 4px}.summaryCell:first-child{grid-column:1/-1;border-bottom:1px solid #252b32}.summaryCell:nth-child(2){border-right:1px solid #252b32}
-.summaryLabel{font-size:8px;color:#9fa7b0;font-weight:850;letter-spacing:.3px}
-.summaryValue{font-size:16px;font-weight:950;margin-top:2px}.summaryCell:first-child .summaryValue{font-size:20px}
-.summarySub{font-size:8px;color:#c2c7cc;margin-top:1px}
+.summary{display:flex;align-items:center;justify-content:center;gap:10px;border-top:0;padding:5px 8px 7px}
+.summaryGoal{text-align:center;padding:2px 4px 4px}
+.summaryGoalLabel{font-size:8px;color:#9fa7b0;font-weight:850;letter-spacing:.5px}
+.summaryGoalValue{font-size:20px;font-weight:1000;margin-top:1px}
+.summaryLine{display:flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;font-size:13px;font-weight:900}
+.summaryLine .saved{color:var(--green)}
+.summaryLine .toGo{color:var(--yellow)}
+.summaryDivider{color:#6f7880;font-weight:700}
 .green{color:var(--green)}.yellow{color:var(--yellow)}
 
 .controls{border-top:1px solid #252b32;padding:7px 7px 8px}
@@ -177,8 +178,7 @@ svg{display:block;width:100%;height:auto}
  .missionName{font-size:11px;max-width:calc(100% - 72px)}.due{font-size:7px}
  .pct{font-size:24px}.pctLabel{font-size:7.5px}
  .milestoneLabel{font-size:7px}.milestoneValue{font-size:6.5px}
- .summaryCell{padding:4px 2px}
- .summaryLabel{font-size:6.5px}.summaryValue{font-size:12px}.summaryCell:first-child .summaryValue{font-size:15px}.summarySub{font-size:6.5px}
+ .summary{padding:4px 3px 6px;gap:7px}.summaryGoalLabel{font-size:6.5px}.summaryGoalValue{font-size:15px}.summaryLine{font-size:9px;gap:6px}
  .controls{padding:5px}
  .control input{font-size:12px;padding:7px 2px}
  .control button{font-size:8px;padding:7px 2px}
@@ -582,17 +582,20 @@ body.sf-fullscreen-open{overflow:hidden}
   flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
   overflow:hidden;will-change:transform,opacity;
 }
-.sf-fs-stage .sf-fs-gauge{width:min(94vw,560px)}
+.sf-fs-goal-label{font-size:13px;color:#9fa7b0;font-weight:850;letter-spacing:.7px;margin-top:5px}
+.sf-fs-goal-value{font-size:36px;font-weight:1000;line-height:1.05;margin-top:2px}
+.sf-fs-stage .sf-fs-gauge{width:min(94vw,560px);margin-top:4px}
 .sf-fs-gauge svg{width:100%;height:auto;display:block}
-.sf-fs-percent{font-size:44px;font-weight:1000;color:#82f10c;line-height:1}
-.sf-fs-amount{font-size:18px;font-weight:850;margin-top:7px}
+.sf-fs-amount{font-size:18px;font-weight:900;margin-top:0;white-space:nowrap}
+.sf-fs-amount .saved{color:#68d83f}.sf-fs-amount .toGo{color:#f1c31c}.sf-fs-amount .divider{color:#6f7880;padding:0 9px}
 .sf-fs-date{font-size:13px;color:#9ba8af;margin-top:5px}
 .sf-fs-status{margin-top:10px;font-size:13px;font-weight:950;letter-spacing:.8px;color:#67d83f;text-transform:uppercase;min-height:18px}
-.sf-fs-controls{width:min(94vw,560px);margin:12px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.sf-fs-controls input{grid-column:1/-1;width:100%;box-sizing:border-box;background:#070b0f;border:1px solid #3d4b54;border-radius:9px;color:#fff;text-align:center;font-size:16px;padding:9px 8px;outline:none}
+.sf-fs-controls{width:min(94vw,560px);margin:12px auto 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.sf-fs-controls input{grid-column:1/-1;width:100%;box-sizing:border-box;background:#070b0f;border:1px solid #3d4b54;border-radius:9px;color:#fff;text-align:center;font-size:16px;padding:12px 8px;outline:none}
+.sf-fs-controls input::placeholder{color:#aab2b8;opacity:1}
 .sf-fs-controls input:focus{border-color:#7f8e98}
-.sf-fs-controls button{border:0;border-radius:9px;color:#fff;font-size:10px;font-weight:950;padding:10px 5px;min-height:40px}
-.sf-fs-add{background:#3aa91f}.sf-fs-withdraw{background:#c92d2d}.sf-fs-update{grid-column:1/-1;background:#245f91}
+.sf-fs-controls button{border:0;border-radius:9px;color:#fff;font-size:10px;font-weight:950;padding:10px 5px;min-height:44px}
+.sf-fs-add{background:#3aa91f}.sf-fs-withdraw{background:#c92d2d}.sf-fs-update{background:#245f91}
 .sf-fs-nav{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 0 3px;flex:0 0 auto}
 .sf-fs-nav button{width:52px;height:48px;border:1px solid #3b4c55;background:#0b151c;color:#f3f6f7;border-radius:12px;font-size:23px}
 .sf-fs-dots{display:flex;gap:6px;max-width:230px;overflow:hidden;align-items:center;justify-content:center}
@@ -611,8 +614,8 @@ body.sf-fullscreen-open{overflow:hidden}
 @media(max-width:700px){
   .sf-mobile-hint{display:flex;justify-content:center;gap:8px;color:#8d9ba2;font-size:10px;margin:4px 0 8px}
   .sf-fs-name{font-size:18px}
-  .sf-fs-percent{font-size:38px}
-  .sf-fs-amount{font-size:16px}
+  .sf-fs-goal-label{font-size:11px}.sf-fs-goal-value{font-size:29px}
+  .sf-fs-amount{font-size:15px}
   .sf-fs-controls{margin-top:8px}
 }
 
@@ -839,13 +842,14 @@ body.sf-fullscreen-open{overflow:hidden}
     </div>
   </div>
   <div class="sf-fs-stage" id="sfFsStage">
+    <div class="sf-fs-goal-label">GOAL AMOUNT</div>
+    <div class="sf-fs-goal-value" id="sfFsGoal">$0.00</div>
     <div class="sf-fs-gauge" id="sfFsGauge"></div>
-    <div class="sf-fs-percent" id="sfFsPercent">0.0%</div>
-    <div class="sf-fs-amount" id="sfFsAmount">$0.00 / $0.00</div>
+    <div class="sf-fs-amount" id="sfFsAmount">$0.00 saved <span class="divider">•</span> $0.00 to go</div>
     <div class="sf-fs-date" id="sfFsDate"></div>
     <div class="sf-fs-status" id="sfFsStatus"></div>
     <div class="sf-fs-controls">
-      <input id="sfFsBalanceInput" inputmode="decimal" type="number" min="0" step="0.01" placeholder="$ amount">
+      <input id="sfFsBalanceInput" inputmode="decimal" type="number" min="0" step="0.01" placeholder="Enter dollar amount then select Add, Withdraw, or Update below">
       <button type="button" class="sf-fs-add" id="sfFsAdd">ADD</button>
       <button type="button" class="sf-fs-withdraw" id="sfFsWithdraw">WITHDRAW</button>
       <button type="button" class="sf-fs-update" id="sfFsUpdate">UPDATE BALANCE</button>
@@ -987,8 +991,7 @@ function gaugeSVG(m,i){
   ${milestone(45,"3/4",q3)}
   <text x="47" y="154" fill="#ff3030" class="dial" font-size="13">E</text>
   <text x="253" y="154" fill="#68d83f" class="dial" font-size="13">F</text>
-  <text x="150" y="91" class="pct ${zoneClass(m)}">${percent(m).toFixed(1)}%</text>
-  <text x="150" y="108" class="pctLabel">SAVED</text>
+  <text x="150" y="98" class="pct ${zoneClass(m)}">${percent(m).toFixed(1)}%</text>
   <line class="needleShadow" x1="150" y1="${gaugeCY}" x2="${x}" y2="${y}"/>
   <line class="needle" x1="150" y1="${gaugeCY}" x2="${x}" y2="${y}"/>
   <circle class="hub" cx="150" cy="${gaugeCY}" r="12"/><circle class="hub2" cx="150" cy="${gaugeCY}" r="7"/>
@@ -1006,21 +1009,18 @@ function renderCard(m,i){
       <div class="missionName">${escapeHtml(m.name)}</div>
     </div>
   </div>
+  <div class="summaryGoal">
+    <div class="summaryGoalLabel">GOAL AMOUNT</div>
+    <div class="summaryGoalValue">${money(m.goal)}</div>
+  </div>
   <div class="gauge">${gaugeSVG(m,i)}</div>
-   <div class="summary">
-    <div class="summaryCell">
-     <div class="summaryLabel">GOAL AMOUNT</div>
-     <div class="summaryValue">${money(m.goal)}</div>
+  <div class="summary">
+    <div class="summaryLine">
+      <span class="saved">${money(m.current)} saved</span>
+      <span class="summaryDivider">•</span>
+      <span class="toGo">${money(remaining)} to go</span>
     </div>
-    <div class="summaryCell">
-     <div class="summaryLabel">SAVED</div>
-     <div class="summaryValue green">${money(m.current)} saved</div>
-    </div>
-    <div class="summaryCell">
-     <div class="summaryLabel">TO GO</div>
-     <div class="summaryValue">${money(remaining)} to go</div>
-    </div>
-   </div>
+  </div>
   <div class="missionFoot">
    <span>${complete?'<span class="complete">● FULL</span>':'Next: '+money(Math.max(m.goal*.25-m.current,0))+' to 1/4'}</span>
    <span>${m.due}</span>
@@ -1187,8 +1187,8 @@ function sfRenderFullscreen(index){
   const gauge=document.getElementById('sfFsGauge');
   gauge.innerHTML=gaugeSVG(m,900+sfFullscreenIndex);
   document.getElementById('sfFsName').textContent=m.name;
-  document.getElementById('sfFsPercent').textContent=p.toFixed(1)+'%';
-  document.getElementById('sfFsAmount').textContent=money(m.current)+' / '+money(m.goal)+' • '+money(remaining)+' remaining';
+  document.getElementById('sfFsGoal').textContent=money(m.goal);
+  document.getElementById('sfFsAmount').innerHTML=`<span class="saved">${money(m.current)} saved</span><span class="divider">•</span><span class="toGo">${money(remaining)} to go</span>`;
   document.getElementById('sfFsDate').textContent=m.date ? 'Target: '+formatDate(m.date) : '';
   document.getElementById('sfFsStatus').textContent=complete ? 'MISSION ACCOMPLISHED • FULL' : '';
   document.getElementById('sfFsBalanceInput').value='';
