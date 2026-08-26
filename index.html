@@ -85,16 +85,16 @@ svg{display:block;width:100%;height:auto}
 .hub{fill:#252a30;stroke:#858b91;stroke-width:1.5}.hub2{fill:#101419;stroke:#aaa;stroke-width:1}
 .dial{font-weight:900;text-anchor:middle}.money{text-anchor:middle;fill:#dfe2e5}
 .pct{font-size:29px;font-weight:950;text-anchor:middle;transition:fill .25s ease}.pct.red{fill:#ff3030}.pct.yellow{fill:#f1c31c}.pct.green{fill:#68d83f}
-.centerMoney{fill:#fff;font-size:12px;text-anchor:middle}
+.pctLabel{fill:#68d83f;font-size:9px;font-weight:950;text-anchor:middle;letter-spacing:.8px}
 .milestoneValue{font-size:8px;fill:#cfd4d9;text-anchor:middle;font-weight:700}
 .milestoneLabel{font-size:9px;fill:#fff;text-anchor:middle;font-weight:900}
 
 .summary{
  display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #252b32;
 }
-.summaryCell{text-align:center;padding:6px 4px}.summaryCell:first-child{border-right:1px solid #252b32}
-.summaryLabel{font-size:8px;color:#9fa7b0;font-weight:850}
-.summaryValue{font-size:16px;font-weight:950;margin-top:2px}
+.summaryCell{text-align:center;padding:5px 4px}.summaryCell:first-child{grid-column:1/-1;border-bottom:1px solid #252b32}.summaryCell:nth-child(2){border-right:1px solid #252b32}
+.summaryLabel{font-size:8px;color:#9fa7b0;font-weight:850;letter-spacing:.3px}
+.summaryValue{font-size:16px;font-weight:950;margin-top:2px}.summaryCell:first-child .summaryValue{font-size:20px}
 .summarySub{font-size:8px;color:#c2c7cc;margin-top:1px}
 .green{color:var(--green)}.yellow{color:var(--yellow)}
 
@@ -175,10 +175,10 @@ svg{display:block;width:100%;height:auto}
  .mission{border-radius:12px}
  .missionHead{padding:7px 7px 2px;min-height:25px}
  .missionName{font-size:11px;max-width:calc(100% - 72px)}.due{font-size:7px}
- .pct{font-size:24px}.centerMoney{font-size:9px}
+ .pct{font-size:24px}.pctLabel{font-size:7.5px}
  .milestoneLabel{font-size:7px}.milestoneValue{font-size:6.5px}
- .summaryCell{padding:5px 2px}
- .summaryLabel{font-size:6.5px}.summaryValue{font-size:12px}.summarySub{font-size:6.5px}
+ .summaryCell{padding:4px 2px}
+ .summaryLabel{font-size:6.5px}.summaryValue{font-size:12px}.summaryCell:first-child .summaryValue{font-size:15px}.summarySub{font-size:6.5px}
  .controls{padding:5px}
  .control input{font-size:12px;padding:7px 2px}
  .control button{font-size:8px;padding:7px 2px}
@@ -988,7 +988,7 @@ function gaugeSVG(m,i){
   <text x="47" y="154" fill="#ff3030" class="dial" font-size="13">E</text>
   <text x="253" y="154" fill="#68d83f" class="dial" font-size="13">F</text>
   <text x="150" y="91" class="pct ${zoneClass(m)}">${percent(m).toFixed(1)}%</text>
-  <text x="150" y="108" class="centerMoney">${money(m.current)} / ${money(m.goal)}</text>
+  <text x="150" y="108" class="pctLabel">SAVED</text>
   <line class="needleShadow" x1="150" y1="${gaugeCY}" x2="${x}" y2="${y}"/>
   <line class="needle" x1="150" y1="${gaugeCY}" x2="${x}" y2="${y}"/>
   <circle class="hub" cx="150" cy="${gaugeCY}" r="12"/><circle class="hub2" cx="150" cy="${gaugeCY}" r="7"/>
@@ -1007,23 +1007,20 @@ function renderCard(m,i){
     </div>
   </div>
   <div class="gauge">${gaugeSVG(m,i)}</div>
-  <div class="summary">
-   <div class="summaryCell">
-    <div class="summaryLabel">GOAL AMOUNT</div>
-    <div class="summaryValue">${money(m.goal)}</div>
-    <div class="summarySub">target</div>
+   <div class="summary">
+    <div class="summaryCell">
+     <div class="summaryLabel">GOAL AMOUNT</div>
+     <div class="summaryValue">${money(m.goal)}</div>
+    </div>
+    <div class="summaryCell">
+     <div class="summaryLabel">SAVED</div>
+     <div class="summaryValue green">${money(m.current)} saved</div>
+    </div>
+    <div class="summaryCell">
+     <div class="summaryLabel">TO GO</div>
+     <div class="summaryValue">${money(remaining)} to go</div>
+    </div>
    </div>
-   <div class="summaryCell">
-    <div class="summaryLabel">CURRENT BALANCE</div>
-    <div class="summaryValue green">${money(m.current)}</div>
-    <div class="summarySub">${percent(m).toFixed(2)}% funded</div>
-   </div>
-   <div class="summaryCell">
-    <div class="summaryLabel">BALANCE REMAINING</div>
-    <div class="summaryValue">${money(remaining)}</div>
-    <div class="summarySub">${complete?"MISSION COMPLETE":"to target"}</div>
-   </div>
-  </div>
   <div class="missionFoot">
    <span>${complete?'<span class="complete">● FULL</span>':'Next: '+money(Math.max(m.goal*.25-m.current,0))+' to 1/4'}</span>
    <span>${m.due}</span>
